@@ -30,14 +30,14 @@ class SimpleVocab(object):
 
   def tokenize_text(self, text):
     text = text.encode('ascii', 'ignore').decode('ascii')
-    tokens = str(text).lower().translate(None,
-                                         string.punctuation).strip().split()
+    tokens = str(text).lower().translate(str.maketrans("","",
+                                         string.punctuation)).strip().split()
     return tokens
 
   def add_text_to_vocab(self, text):
     tokens = self.tokenize_text(text)
     for token in tokens:
-      if not self.word2id.has_key(token):
+      if token not in self.word2id:
         self.word2id[token] = len(self.word2id)
         self.wordcount[token] = 0
       self.wordcount[token] += 1
@@ -98,7 +98,7 @@ class TextLSTMModel(torch.nn.Module):
       itexts[:lengths[i], i] = torch.tensor(texts[i])
 
     # embed words
-    itexts = torch.autograd.Variable(itexts).cuda()
+    itexts = torch.autograd.Variable(itexts)
     etexts = self.embedding_layer(itexts)
 
     # lstm
@@ -118,6 +118,6 @@ class TextLSTMModel(torch.nn.Module):
     batch_size = etexts.shape[1]
     first_hidden = (torch.zeros(1, batch_size, self.lstm_hidden_dim),
                     torch.zeros(1, batch_size, self.lstm_hidden_dim))
-    first_hidden = (first_hidden[0].cuda(), first_hidden[1].cuda())
+    first_hidden = (first_hidden[0], first_hidden[1])
     lstm_output, last_hidden = self.lstm(etexts, first_hidden)
     return lstm_output, last_hidden

@@ -58,7 +58,7 @@ def parse_opt():
 
 def load_dataset(opt):
   """Loads the input datasets."""
-  print 'Reading dataset ', opt.dataset
+  print('Reading dataset ', opt.dataset)
   if opt.dataset == 'css3d':
     trainset = datasets.CSSDataset(
         path=opt.dataset_path,

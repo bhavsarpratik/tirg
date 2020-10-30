@@ -19,8 +19,9 @@ import numpy as np
 import torch
 import torchvision
 import torch.nn.functional as F
-import text_model
-import torch_functions
+# from jina.hub.encoders.image.TirgEncoder import text_model
+# from jina.hub.encoders.image.TirgEncoder import torch_functions
+import text_model, torch_functions
 
 
 class ConCatModule(torch.nn.Module):
@@ -195,7 +196,7 @@ class TIRG(ImgEncoderTextEncoderBase):
   def compose_img_text_features(self, img_features, text_features):
     f1 = self.gated_feature_composer((img_features, text_features))
     f2 = self.res_info_composer((img_features, text_features))
-    f = F.sigmoid(f1) * img_features * self.a[0] + f2 * self.a[1]
+    f = torch.sigmoid(f1) * img_features * self.a[0] + f2 * self.a[1]
     return f
 
 
@@ -247,7 +248,7 @@ class TIRGLastConv(ImgEncoderTextEncoderBase):
     z = torch.cat((x, y), dim=1)
     t = self.mod2d(z)
     tgate = self.mod2d_gate(z)
-    x = self.a[0] * F.sigmoid(tgate) * x + self.a[1] * t
+    x = self.a[0] * torch.sigmoid(tgate) * x + self.a[1] * t
 
     x = self.img_model.avgpool(x)
     x = x.view(x.size(0), -1)
